@@ -1,4 +1,4 @@
-This is LuaHBTeX, Version 1.12.0 (TeX Live 2020)  (format=lualatex 2021.2.24)  11 MAR 2021 17:50
+This is LuaHBTeX, Version 1.12.0 (TeX Live 2020)  (format=lualatex 2021.2.24)  11 MAR 2021 19:24
  restricted system commands enabled.
 **source.tex
 (./source.tex
@@ -652,7 +652,16 @@ LaTeX Font Info:    Font shape `JT3/gt/m/n' will be
 LaTeX Font Info:    Font shape `JY3/gt/m/n' will be
 (Font)              scaled to size 13.31586pt on input line 24.
 (load cache: extra_lmsans12-regular.luc)
-(./source.toc)
+(./source.toc
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <7> on input line 3.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <5> on input line 3.
+LaTeX Font Info:    Font shape `JY3/mc/m/n' will be
+(Font)              scaled to size 6.47299pt on input line 3.
+LaTeX Font Info:    Font shape `JY3/mc/m/n' will be
+(Font)              scaled to size 4.62357pt on input line 3.
+)
 \tf@toc=\write4
 
 \openout4 = source.toc
@@ -674,8 +683,6 @@ LaTeX Font Info:    Font shape `JY3/mc/m/n' will be
 (load cache: extra_lmroman5-regular.luc)
 LaTeX Font Info:    Font shape `JT3/mc/m/n' will be
 (Font)              scaled to size 4.62357pt on input line 1.
-LaTeX Font Info:    Font shape `JY3/mc/m/n' will be
-(Font)              scaled to size 4.62357pt on input line 1.
 LaTeX Font Info:    Font shape `TU/lmtt/bx/n' in size <9> not available
 (Font)              Font shape `TU/lmtt/b/n' tried instead on input line 1.
 (load cache: extra_lmmonolt10-bold.luc)
@@ -689,29 +696,44 @@ LaTeX Font Info:    Font shape `JY3/gt/m/n' will be
 (Font)              scaled to size 8.32242pt on input line 1.
 (load cache: extra_lmmono10-italic.luc)
 LaTeX Font Info:    Font shape `JT3/gt/m/it' in size <9> not available
-(Font)              Font shape `JT3/gt/m/n' tried instead on input line 5.
+(Font)              Font shape `JT3/gt/m/n' tried instead on input line 28.
 LaTeX Font Info:    Font shape `JT3/gt/m/n' will be
-(Font)              scaled to size 8.32242pt on input line 5.
+(Font)              scaled to size 8.32242pt on input line 28.
 LaTeX Font Info:    Font shape `JY3/gt/m/it' in size <9> not available
-(Font)              Font shape `JY3/gt/m/n' tried instead on input line 5.
+(Font)              Font shape `JY3/gt/m/n' tried instead on input line 28.
 LaTeX Font Info:    Font shape `JY3/gt/m/n' will be
-(Font)              scaled to size 8.32242pt on input line 5.
+(Font)              scaled to size 8.32242pt on input line 28.
 )
 Removing  `ltj.listings_unicode' from `process_input_buffer'. [2
 
-] [3] (./source.aux))
+]
+LaTeX Font Info:    Font shape `JT3/gt/m/n' will be
+(Font)              scaled to size 11.09656pt on input line 31.
+LaTeX Font Info:    Font shape `JY3/gt/m/n' will be
+(Font)              scaled to size 11.09656pt on input line 31.
+Removing  `ltj.process_input_buffer' from `process_input_buffer'.
+Inserting `ltj.listings_unicode' at position 1 in `process_input_buffer'.
+Inserting `ltj.process_input_buffer' at position 2 in `process_input_buffer'. (./src/battery.h)
+Removing  `ltj.listings_unicode' from `process_input_buffer'.
+Removing  `ltj.process_input_buffer' from `process_input_buffer'.
+Inserting `ltj.listings_unicode' at position 1 in `process_input_buffer'.
+Inserting `ltj.process_input_buffer' at position 2 in `process_input_buffer'. (./src/battery.cpp)
+Removing  `ltj.listings_unicode' from `process_input_buffer'. [3
+
+]
+[4] (./source.aux))
 
 Here is how much of LuaTeX's memory you used:
- 6233 strings out of 478543
- 933196,662416 words of node,token memory allocated
- 18856 words of node memory still in use:
-   7 hlist, 1 vlist, 4 rule, 2 glue, 339 kern, 1 glyph, 7409 attribute, 263 glue
-_spec, 381 attribute_list, 1 write, 17 user_defined nodes
-   avail lists: 1:33,2:191630,3:237,4:19625,5:13035,6:170,7:12453,8:2,9:27454,10
-:18,11:700
- 25780 multiletter control sequences out of 65536+600000
- 57 fonts using 46472071 bytes
- 127i,6n,124p,7873b,804s stack positions out of 5000i,500n,10000p,200000b,200000s
+ 6304 strings out of 478543
+ 1458219,662416 words of node,token memory allocated
+ 21183 words of node memory still in use:
+   7 hlist, 1 vlist, 4 rule, 2 glue, 374 kern, 1 glyph, 8163 attribute, 375 glue
+_spec, 419 attribute_list, 1 write, 19 user_defined nodes
+   avail lists: 1:36,2:287360,3:630,4:29894,5:20370,6:164,7:18351,8:2,9:42319,10
+:27,11:1207
+ 25827 multiletter control sequences out of 65536+600000
+ 69 fonts using 54725823 bytes
+ 127i,6n,124p,7873b,766s stack positions out of 5000i,500n,10000p,200000b,200000s
 </usr/local/texlive/2020/texmf-dist/fonts/opentype/public/lm/lmmono10-italic.otf
 ></usr/local/texlive/2020/texmf-dist/fonts/opentype/public/lm/lmmono9-regular.ot
 f></usr/local/texlive/2020/texmf-dist/fonts/opentype/public/lm/lmmonolt10-bold.o
@@ -724,10 +746,10 @@ HaranoAjiGothic-Medium.otf></usr/local/texlive/2020/texmf-dist/fonts/opentype/pu
 blic/lm/lmroman12-regular.otf></usr/local/texlive/2020/texmf-dist/fonts/opentype
 /public/haranoaji/HaranoAjiMincho-Regular.otf></usr/local/texlive/2020/texmf-dis
 t/fonts/opentype/public/lm/lmroman17-regular.otf>
-Output written on source.pdf (3 pages, 39751 bytes).
+Output written on source.pdf (4 pages, 47491 bytes).
 
-PDF statistics: 91 PDF objects out of 1000 (max. 8388607)
- 52 compressed objects within 1 object stream
+PDF statistics: 94 PDF objects out of 1000 (max. 8388607)
+ 54 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 131072)
  1 words of extra memory for PDF output out of 10000 (max. 100000000)
 
