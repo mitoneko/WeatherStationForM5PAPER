@@ -1,0 +1,29 @@
+\documentclass[a4paper, 10pt]{ltjsarticle}
+\usepackage[top=1cm,bottom=1cm,left=2cm,right=1cm,includefoot]{geometry}
+\usepackage{listings, listings-rust}
+\lstset{
+    language = C++,
+    breaklines = true,
+    breakindent = 8pt,
+    basicstyle = \ttfamily\small,
+    frame = TBrl,
+    framesep = 5pt,
+    numbers = left,
+    stepnumber = 1,
+    numberstyle = \tiny,
+    tabsize = 4,
+    captionpos = t
+}
+\usepackage{graphicx}
+
+\title{M5Paper 環境モニターソース}
+\author{美都}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\clearpage
+
+\section {main.cpp}
+\lstinputlisting{src/main.cpp}
+\end{document}

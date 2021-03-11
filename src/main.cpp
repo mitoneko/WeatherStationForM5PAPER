@@ -1,23 +1,26 @@
 #include <M5EPD.h>
+#define LGFX_M5PAPER  
+#include <LovyanGFX.hpp>
 
 #include "battery.h"
 
-//M5EPD_Canvas canvas(&M5.EPD);
+static LGFX lcd;
 
 void setup()
 {
     M5.begin(false, true, true, true, true);
     M5.BatteryADCBegin();
     M5.RTC.begin();
-    M5.EPD.Clear(true);
-    M5EPD_Canvas *_init_canvas = new M5EPD_Canvas(&M5.EPD);
-    _init_canvas->loadFont("/font.ttf", SD);
+    lcd.init();
+    lcd.setRotation(1);
+
+
 }
 
 
 void loop()
 {
-    int bat = drawBattery(960-120-5, 5);
+    int bat = drawBattery(960-120-5, 5, &lcd);
     if (bat > 90 || bat==1) {
         delay(5000);
     } else {
