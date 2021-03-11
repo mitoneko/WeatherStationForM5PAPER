@@ -1,4 +1,4 @@
-#include <M5EPD.h>
+#include "battery.h"
 
 // バッテリー残量の取得
 static int get_rest_battery() {
@@ -15,27 +15,30 @@ static int get_rest_battery() {
 }
 
 // バッテリー残量計の表示
-int drawBattery(int x, int y) {
-    M5EPD_Canvas *canvas = new M5EPD_Canvas(&M5.EPD);
+int drawBattery(int x, int y, LGFX *lcd) {
+    LGFX_Sprite battery_meter(lcd);
     int rest_battery = get_rest_battery();
     
     // バッテリー矩形の表示
-    canvas->createCanvas(120, 30); 
-    canvas->fillCanvas(0);
-    canvas->drawRect(10, 10, 45, 20, 15);
-    canvas->fillRect(55, 17, 5, 5, 15);
-    canvas->fillRect(10, 10, (int)((45*rest_battery)/100), 20, 15);
+    battery_meter.setColorDepth(4);
+    battery_meter.createSprite(120, 30);
+    battery_meter.fillSprite(15);
+    battery_meter.setColor(0);
+    battery_meter.drawRect(10, 10, 45, 20);
+    battery_meter.fillRect(55, 17, 5, 5);
+    battery_meter.fillRect(10, 10, (int)((45*rest_battery)/100), 20);
 
     // バッテリー残量文字の表示
-    canvas->createRender(19, 20);
-    canvas->setTextColor(15);
-    canvas->setTextSize(19);
-    canvas->setTextArea(62, 10, 60, 20);
-    canvas->printf("%d%%", rest_battery);
-    canvas->pushCanvas(x, y, UPDATE_MODE_GLD16);
+    battery_meter.setFont(&fonts::lgfxJapanMinchoP_20);
+    battery_meter.setTextSize(1, 1); // 縦,横　倍率
+    battery_meter.setTextColor(0, 15); // 文字色,背景
+    battery_meter.setCursor(62, 10);
+    battery_meter.printf("%d%%", rest_battery);
 
-    canvas->deleteCanvas();
-    delete canvas;
+    lcd->startWrite();
+    battery_meter.pushSprite(x, y);
+    lcd->endWrite();
+
     return rest_battery;
 }
 
