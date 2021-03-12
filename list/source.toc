@@ -2,3 +2,6 @@
 \contentsline {section}{\numberline {2}バッテリーメーター}{3}{}%
 \contentsline {subsection}{\numberline {2.1}battery.h}{3}{}%
 \contentsline {subsection}{\numberline {2.2}battery.cpp}{3}{}%
+\contentsline {section}{\numberline {3}温湿度計}{5}{}%
+\contentsline {subsection}{\numberline {3.1}thermometer.hpp}{5}{}%
+\contentsline {subsection}{\numberline {3.2}thermometer.cpp}{5}{}%
