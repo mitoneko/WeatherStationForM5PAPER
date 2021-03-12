@@ -1,4 +1,4 @@
-This is LuaHBTeX, Version 1.12.0 (TeX Live 2020)  (format=lualatex 2021.2.24)  11 MAR 2021 19:24
+This is LuaHBTeX, Version 1.12.0 (TeX Live 2020)  (format=lualatex 2021.2.24)  12 MAR 2021 18:30
  restricted system commands enabled.
 **source.tex
 (./source.tex
@@ -696,13 +696,13 @@ LaTeX Font Info:    Font shape `JY3/gt/m/n' will be
 (Font)              scaled to size 8.32242pt on input line 1.
 (load cache: extra_lmmono10-italic.luc)
 LaTeX Font Info:    Font shape `JT3/gt/m/it' in size <9> not available
-(Font)              Font shape `JT3/gt/m/n' tried instead on input line 28.
+(Font)              Font shape `JT3/gt/m/n' tried instead on input line 33.
 LaTeX Font Info:    Font shape `JT3/gt/m/n' will be
-(Font)              scaled to size 8.32242pt on input line 28.
+(Font)              scaled to size 8.32242pt on input line 33.
 LaTeX Font Info:    Font shape `JY3/gt/m/it' in size <9> not available
-(Font)              Font shape `JY3/gt/m/n' tried instead on input line 28.
+(Font)              Font shape `JY3/gt/m/n' tried instead on input line 33.
 LaTeX Font Info:    Font shape `JY3/gt/m/n' will be
-(Font)              scaled to size 8.32242pt on input line 28.
+(Font)              scaled to size 8.32242pt on input line 33.
 )
 Removing  `ltj.listings_unicode' from `process_input_buffer'. [2
 
@@ -721,19 +721,30 @@ Inserting `ltj.process_input_buffer' at position 2 in `process_input_buffer'. (.
 Removing  `ltj.listings_unicode' from `process_input_buffer'. [3
 
 ]
-[4] (./source.aux))
+[4]
+Removing  `ltj.process_input_buffer' from `process_input_buffer'.
+Inserting `ltj.listings_unicode' at position 1 in `process_input_buffer'.
+Inserting `ltj.process_input_buffer' at position 2 in `process_input_buffer'. (./src/thermometer.hpp)
+Removing  `ltj.listings_unicode' from `process_input_buffer'.
+Removing  `ltj.process_input_buffer' from `process_input_buffer'.
+Inserting `ltj.listings_unicode' at position 1 in `process_input_buffer'.
+Inserting `ltj.process_input_buffer' at position 2 in `process_input_buffer'. (./src/thermometer.cpp [5
+
+] [6])
+Removing  `ltj.listings_unicode' from `process_input_buffer'. [7] (./source.aux
+))
 
 Here is how much of LuaTeX's memory you used:
- 6304 strings out of 478543
- 1458219,662416 words of node,token memory allocated
- 21183 words of node memory still in use:
-   7 hlist, 1 vlist, 4 rule, 2 glue, 374 kern, 1 glyph, 8163 attribute, 375 glue
-_spec, 419 attribute_list, 1 write, 19 user_defined nodes
-   avail lists: 1:36,2:287360,3:630,4:29894,5:20370,6:164,7:18351,8:2,9:42319,10
-:27,11:1207
- 25827 multiletter control sequences out of 65536+600000
+ 6432 strings out of 478543
+ 2278412,662416 words of node,token memory allocated
+ 23763 words of node memory still in use:
+   7 hlist, 1 vlist, 4 rule, 2 glue, 374 kern, 1 glyph, 8231 attribute, 859 glue
+_spec, 423 attribute_list, 1 write, 23 user_defined nodes
+   avail lists: 1:34,2:451254,3:630,4:49859,5:35105,6:173,7:29654,8:4,9:70862,10
+:36,11:2161
+ 25931 multiletter control sequences out of 65536+600000
  69 fonts using 54725823 bytes
- 127i,6n,124p,7873b,766s stack positions out of 5000i,500n,10000p,200000b,200000s
+ 127i,6n,124p,7873b,794s stack positions out of 5000i,500n,10000p,200000b,200000s
 </usr/local/texlive/2020/texmf-dist/fonts/opentype/public/lm/lmmono10-italic.otf
 ></usr/local/texlive/2020/texmf-dist/fonts/opentype/public/lm/lmmono9-regular.ot
 f></usr/local/texlive/2020/texmf-dist/fonts/opentype/public/lm/lmmonolt10-bold.o
@@ -746,10 +757,10 @@ HaranoAjiGothic-Medium.otf></usr/local/texlive/2020/texmf-dist/fonts/opentype/pu
 blic/lm/lmroman12-regular.otf></usr/local/texlive/2020/texmf-dist/fonts/opentype
 /public/haranoaji/HaranoAjiMincho-Regular.otf></usr/local/texlive/2020/texmf-dis
 t/fonts/opentype/public/lm/lmroman17-regular.otf>
-Output written on source.pdf (4 pages, 47491 bytes).
+Output written on source.pdf (7 pages, 60985 bytes).
 
-PDF statistics: 94 PDF objects out of 1000 (max. 8388607)
- 54 compressed objects within 1 object stream
+PDF statistics: 103 PDF objects out of 1000 (max. 8388607)
+ 60 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 131072)
  1 words of extra memory for PDF output out of 10000 (max. 100000000)
 
