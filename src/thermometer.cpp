@@ -38,7 +38,7 @@ void Thermometer::makeMeterFace(int min, int max, const char* unit) {
     face.createSprite(sizex, sizey);
     face.fillSprite(15);
     face.setColor(0);
-    face.setFont(&fonts::lgfxJapanMinchoP_36);
+    face.setFont(&fonts::lgfxJapanGothic_36);
     face.setTextColor(0, 15);
     face.setTextDatum(middle_center);
     float center[2] = {sizex/2.0f, sizey/2.0f};
