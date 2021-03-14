@@ -4,7 +4,7 @@
 
 #include "battery.h"
 #include "thermometer.hpp"
-#include "info_from_net.hpp"
+#include "infoFromNet.hpp"
 #include "tokei.hpp"
 
 static LGFX lcd;
