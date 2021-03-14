@@ -2,7 +2,7 @@
 #define LGFX_M5PAPER
 #include <LovyanGFX.hpp>
 #include <WiFi.h>
-#include "info_from_net.hpp"
+#include "infoFromNet.hpp"
 #include "time.h"
 
 // wifiid.hには、ssid,passwordの各defineを定義を記載すること。

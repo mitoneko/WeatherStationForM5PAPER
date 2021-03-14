@@ -1,3 +1,7 @@
 .pio
 tags
 src/wifiid.h
+list/src
+list/*.aux
+list/*.log
+list/*.toc
