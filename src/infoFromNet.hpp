@@ -6,13 +6,12 @@
 
 class GetInfoFromNetwork {
     private:
-        
-        int wifiOn(void);
-        void wifiOff(void);
 
+        bool wifiOn(void);
+        void wifiOff(void);
     public:
         GetInfoFromNetwork();
+        ~GetInfoFromNetwork() ;
+        int isWiFiOn(void);
         int setNtpTime() ;
-        void printWifiStatus(LGFX *lcd, int x, int y) ;
-        void printDateTime(LGFX *lcd, int x, int y) ;
 };        
