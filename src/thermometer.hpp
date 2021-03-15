@@ -22,7 +22,7 @@ class Thermometer {
         float get_temp();
         float get_hum();
 
-        void drawTempMeter(int x, int y, LGFX *lcd);
-        void drawHumMeter(int x, int y, LGFX *lcd);
-        void drawString(int x, int y, LGFX *lcd);
+        void drawTempMeter(LovyanGFX *lcd, int x, int y );
+        void drawHumMeter(LovyanGFX *lcd, int x, int y);
+        void drawString(LovyanGFX *lcd, int x, int y);
 };

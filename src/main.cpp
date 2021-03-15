@@ -12,8 +12,8 @@ static LGFX lcd;
 void drawLcd() {
     drawBattery(960-120-5, 5, &lcd);
     Thermometer t = Thermometer(200,200);
-    t.drawTempMeter(500, 100, &lcd);
-    t.drawHumMeter(700, 100, &lcd);
+    t.drawTempMeter(&lcd, 500, 100);
+    t.drawHumMeter(&lcd, 700, 100);
 
     Tokei tokei = Tokei(300, 100);
     tokei.drawDigitalTokei(&lcd, 100, 100);
