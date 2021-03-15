@@ -10,7 +10,7 @@
 static LGFX lcd;
 
 void drawLcd() {
-    int bat = drawBattery(960-120-5, 5, &lcd);
+    drawBattery(960-120-5, 5, &lcd);
     Thermometer t = Thermometer(200,200);
     t.drawTempMeter(500, 100, &lcd);
     t.drawHumMeter(700, 100, &lcd);
@@ -18,7 +18,7 @@ void drawLcd() {
     Tokei tokei = Tokei(300, 100);
     tokei.drawDigitalTokei(&lcd, 100, 100);
 
-    delay(1000);
+    delay(500);
 }
 
 // ●分ピッタリまでの秒数
@@ -30,9 +30,9 @@ int rest_minute() {
 
 // シャットダウンを試みる。通電中はすり抜ける
 void challengeShutdown() {
-        int rest_sec = rest_minute()-6;
-        if (rest_sec < 30) rest_sec += 60;
-        M5.shutdown(rest_sec); // 一旦停止
+    int rest_sec = rest_minute()-6;
+    if (rest_sec < 30) rest_sec += 60;
+    M5.shutdown(rest_sec); // 一旦停止
 }
 
 void setup()
