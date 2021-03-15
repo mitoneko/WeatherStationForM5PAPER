@@ -64,7 +64,7 @@ void Thermometer::makeMeterFace(int min, int max, const char* unit) {
 
 }
 
-void Thermometer::drawTempMeter(int x, int y, LGFX *lcd) {
+void Thermometer::drawTempMeter(LovyanGFX *lcd, int x, int y) {
     makeMeterFace(0, 50, "℃");
     float center[2] = {(float)sizex/2.f, (float)sizey/2.f};
     float angle = 270.f - 45.f;
@@ -73,7 +73,7 @@ void Thermometer::drawTempMeter(int x, int y, LGFX *lcd) {
     face.pushSprite(lcd, x, y);
 }
 
-void Thermometer::drawHumMeter(int x, int y, LGFX *lcd) {
+void Thermometer::drawHumMeter(LovyanGFX *lcd, int x, int y) {
     makeMeterFace(20, 80, "%");
     float center[2] = {(float)sizex/2.f, (float)sizey/2.f};
     float angle = 270.f - 45.f;
@@ -82,7 +82,7 @@ void Thermometer::drawHumMeter(int x, int y, LGFX *lcd) {
     face.pushSprite(lcd, x, y);
 }
 
-void Thermometer::drawString(int x, int y, LGFX *lcd) {
+void Thermometer::drawString(LovyanGFX *lcd, int x, int y) {
     M5.SHT30.UpdateData();
     LGFX_Sprite meter(lcd);
     meter.setColorDepth(4);
