@@ -1,7 +1,7 @@
 #include "battery.h"
 
 // バッテリー残量の取得
-static int get_rest_battery() {
+int get_rest_battery() {
     const int max_vol = 4350;
     const int min_vol = 3300;
     //M5.BatteryADCBegin();
