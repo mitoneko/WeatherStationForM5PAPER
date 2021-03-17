@@ -1,8 +1,8 @@
 // ネットワークより取得する情報関連
 // 時計・天気予報
 #include <M5EPD.h>
-#define LGFX_M5PAPER
-#include <LovyanGFX.hpp>
+
+#define WeatherFileName "/weather.jsn"
 
 class GetInfoFromNetwork {
     private:
@@ -14,4 +14,6 @@ class GetInfoFromNetwork {
         ~GetInfoFromNetwork() ;
         int isWiFiOn(void);
         int setNtpTime() ;
+        String getWeatherQuery() ;
+        bool getWeatherInfo() ;
 };        

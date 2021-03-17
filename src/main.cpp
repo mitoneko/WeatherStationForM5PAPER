@@ -35,23 +35,31 @@ void challengeShutdown() {
     M5.shutdown(rest_sec); // 一旦停止
 }
 
+void checkInfoFromNetwork(bool always=false) {
+    rtc_time_t time;
+    rtc_date_t date;
+    M5.RTC.getDate(&date);
+    M5.RTC.getTime(&time);
+    if ((time.hour%6==0 && time.min<1) || date.year<2020 || always) {
+        Serial.println("ネットワークの情報の取得開始");
+        GetInfoFromNetwork info;
+        info.setNtpTime();
+        info.getWeatherInfo();
+    }
+}
+
 void setup()
 {
     M5.begin(false, true, true, true, true);
     M5.BatteryADCBegin();
     M5.RTC.begin();
     M5.SHT30.Begin();
+    SD.begin();
+    Serial.begin(115200);
     lcd.init();
     lcd.setRotation(1);
 
-    rtc_time_t time;
-    rtc_date_t date;
-    M5.RTC.getDate(&date);
-    M5.RTC.getTime(&time);
-    if ((time.hour%6==0 && time.min<1) || date.year<2020) {
-        GetInfoFromNetwork info;
-        info.setNtpTime();
-    }
+    checkInfoFromNetwork();
 
     drawLcd();
     challengeShutdown();
@@ -61,6 +69,7 @@ void setup()
 void loop()
 {
     delay((rest_minute()+1)*1000);
+    checkInfoFromNetwork();
     drawLcd();
     challengeShutdown();
 }

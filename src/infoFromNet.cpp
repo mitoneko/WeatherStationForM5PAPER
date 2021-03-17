@@ -1,13 +1,16 @@
 #include <M5EPD.h>
-#define LGFX_M5PAPER
-#include <LovyanGFX.hpp>
 #include <WiFi.h>
+#include <HTTPClient.h>
 #include "infoFromNet.hpp"
-#include "time.h"
+#include <time.h>
 
-// wifiid.hには、ssid,passwordの各defineを定義を記載すること。
+
+// wifiid.hには、ssid,passwordの各defineを定義を文字列として記載すること。
 // このファイルは、.gitignoreとする。
-#include <wifiid.h>
+#include "wifiid.h"
+// apikey.hには、apikeyのdefineの定義を文字列として記載すること。
+// このファイルは、.gitignoreとする。
+#include "apikey.h"
 
 GetInfoFromNetwork::GetInfoFromNetwork() {
     wifiOn();
@@ -57,3 +60,49 @@ int GetInfoFromNetwork::setNtpTime() {
     M5.RTC.setTime(&rtcTime);
     return 0;
 }
+
+
+const uint8_t fingerprint[20] = 
+    { 0xEE,0xAA,0x58,0x6D,0x4F,0x1F,0x42,0xF4,0x18,0x5B,0x7F,0xB0,0xF2,0x0A,0x4C,0xDD,0x97,0x47,0x7D,0x99 };
+#define OpenWeatherUrl "api.openweathermap.org"
+#define City "Nagahama,JP"
+
+String GetInfoFromNetwork::getWeatherQuery() {
+    String url("/data/2.5/forecast?");
+    url += "q=" City;
+    url += "&appid=" apikey;
+    url += "&lang=ja&units=metric";
+    return url;
+}
+
+// 天気予報データをSDカードのWeatherFileNameに書き込む。
+bool GetInfoFromNetwork::getWeatherInfo() {
+    if (!isWiFiOn()) return false;
+    HTTPClient http;
+    File file;
+    String url = String("http://") + String(OpenWeatherUrl) + getWeatherQuery();
+    Serial.print("URL:");
+    Serial.println(url);
+    if (!http.begin(url)) return false;
+    int retCode = http.GET();
+    if (retCode < 0) goto http_err;
+    if (retCode != HTTP_CODE_OK && retCode != HTTP_CODE_MOVED_PERMANENTLY) goto http_err;
+    if (!SD.exists("/")) goto http_err;
+    Serial.println("SD OK!");
+    if (SD.exists(WeatherFileName)) SD.remove(WeatherFileName);
+    file=SD.open(WeatherFileName, FILE_WRITE);
+    if (!file) goto http_err;
+    Serial.println("ファイルオープン完了");
+    if (http.writeToStream(&file) < 0) goto file_err;
+    file.close();
+    Serial.println("weatherファイルへのjsonデータ書き込み完了"); 
+    http.end();
+    return true;
+
+file_err:
+    file.close();
+http_err:
+    http.end();
+    return false;
+}    
+
