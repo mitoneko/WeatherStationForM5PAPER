@@ -6,10 +6,47 @@
 #include "thermometer.hpp"
 #include "infoFromNet.hpp"
 #include "tokei.hpp"
+#include "tenki.hpp"
 
 static LGFX lcd;
 
-void drawLcd() {
+void drawTenki(Tenki *tenki, LovyanGFX *lcd, int x, int y, int width, int height) {
+    LGFX_Sprite sprite;
+    sprite.setColorDepth(4);
+    sprite.createSprite(width, height);
+    sprite.fillSprite(15);
+    sprite.setTextColor(0, 15);
+    sprite.setColor(0);
+    sprite.setFont(&fonts::lgfxJapanGothic_36);
+    float textsize = (height / 4) / 36;
+    sprite.drawRect(0, 0, width, height);
+    for (int i=1; i <= 3 ; i++) {
+        sprite.drawLine(0, height/4*i, width, height/4*i);
+    }
+    sprite.setTextSize(textsize);
+    for (int i=0; i < 1 ; i++) {
+        int top = (height / 3) * i + 1;
+        int listNo = 4;
+        time_t dataTimet = tenki->getDate(listNo);
+        struct tm *dataTm = localtime(&dataTimet);
+        char textbuf[100];
+        sprintf(textbuf, "%2d日%2d時", dataTm->tm_mday, dataTm->tm_hour);
+        int x = 1;
+        sprite.drawString(textbuf, x, top);
+        x += sprite.textWidth(textbuf) + 5;
+        sprite.drawString(tenki->getWeather(listNo), x, top);
+        x += sprite.textWidth("激しい雨") + 5;
+        sprintf(textbuf, "%2d℃", (int)tenki->getTemp(listNo));
+        sprite.drawString(textbuf, x, top);
+        x += sprite.textWidth("00℃") + 5;
+        sprite.drawString(tenki->getWindDir(listNo), x, top);
+        x += sprite.textWidth("南東") + 5;
+        sprite.drawNumber(tenki->getBeaufortScale(listNo), x, top);
+    }
+    sprite.pushSprite(lcd, x, y);
+}
+
+void drawLcd(Tenki *tenki) {
     drawBattery(960-120-5, 5, &lcd);
     Thermometer t = Thermometer(200,200);
     t.drawTempMeter(&lcd, 500, 100);
@@ -17,6 +54,8 @@ void drawLcd() {
 
     Tokei tokei = Tokei(300, 100);
     tokei.drawDigitalTokei(&lcd, 100, 100);
+
+    drawTenki(tenki, &lcd, 950-500-5 , 330, 500, 200);
 
     delay(500);
 }
@@ -35,16 +74,27 @@ void challengeShutdown() {
     M5.shutdown(rest_sec); // 一旦停止
 }
 
-void checkInfoFromNetwork(bool always=false) {
+void checkInfoFromNetwork(Tenki *tenki, bool always=false) {
     rtc_time_t time;
     rtc_date_t date;
     M5.RTC.getDate(&date);
     M5.RTC.getTime(&time);
-    if ((time.hour%6==0 && time.min<1) || date.year<2020 || always) {
+
+    struct tm tm;
+    tm.tm_year = date.year;
+    tm.tm_mon = date.mon-1;
+    tm.tm_mday = date.day;
+    tm.tm_hour = time.hour;
+    tm.tm_min = time.min;
+    tm.tm_sec = time.sec;
+    time_t outdated = mktime(&tm) - 6*3600;
+
+    if (!tenki->isEnable() || (time.hour%6==0 && time.min == 3) || tenki->getDate(0)<outdated) {
         Serial.println("ネットワークの情報の取得開始");
         GetInfoFromNetwork info;
         info.setNtpTime();
         info.getWeatherInfo();
+        tenki->refresh();
     }
 }
 
@@ -59,9 +109,10 @@ void setup()
     lcd.init();
     lcd.setRotation(1);
 
-    checkInfoFromNetwork();
-
-    drawLcd();
+    Tenki tenki;
+    checkInfoFromNetwork(&tenki);
+    
+    drawLcd(&tenki);
     challengeShutdown();
 }
 
@@ -69,8 +120,9 @@ void setup()
 void loop()
 {
     delay((rest_minute()+1)*1000);
-    checkInfoFromNetwork();
-    drawLcd();
+    Tenki tenki;
+    checkInfoFromNetwork(&tenki);
+    drawLcd(&tenki);
     challengeShutdown();
 }
 
