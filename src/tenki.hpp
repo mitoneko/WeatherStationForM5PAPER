@@ -3,6 +3,8 @@
 #include <M5EPD.h>
 #include <ArduinoJson.h>
 
+#ifndef TENKI
+#define TENKI 
 class Tenki {
     private:
         DynamicJsonDocument json;
@@ -42,3 +44,4 @@ class Tenki {
         void readJson() ;
 
 };
+#endif
