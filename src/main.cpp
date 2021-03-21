@@ -8,6 +8,7 @@
 #include "tokei.hpp"
 #include "tenki.hpp"
 #include "drawtenki.hpp"
+#include "util.h"
 
 static LGFX lcd;
 
@@ -42,18 +43,8 @@ void challengeShutdown() {
 
 void checkInfoFromNetwork(Tenki *tenki, bool always=false) {
     rtc_time_t time;
-    rtc_date_t date;
-    M5.RTC.getDate(&date);
     M5.RTC.getTime(&time);
-
-    struct tm tm;
-    tm.tm_year = date.year;
-    tm.tm_mon = date.mon-1;
-    tm.tm_mday = date.day;
-    tm.tm_hour = time.hour;
-    tm.tm_min = time.min;
-    tm.tm_sec = time.sec;
-    time_t outdated = mktime(&tm) - 6*3600;
+    time_t outdated = now() - 6*3600;
 
     if (!tenki->isEnable() || (time.hour%6==0 && time.min == 3) || tenki->getDate(0)<outdated) {
         Serial.println("ネットワークの情報の取得開始");

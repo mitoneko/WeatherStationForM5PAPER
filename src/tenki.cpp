@@ -5,6 +5,7 @@
 
 #include "infoFromNet.hpp"
 #include "tenki.hpp"
+#include "util.h"
 
 Tenki::Tenki() : json(22528), _isEnable(false) {
     readJson();
@@ -41,19 +42,7 @@ const char *Tenki::getWindDir(int i) {
 
 // 現在時刻のh時間後以降の最小時刻のデータのリストNo.を取得する
 int Tenki::getListIdAfterHHour(int h) {
-    rtc_date_t nowDate;
-    rtc_time_t nowTime;
-    M5.RTC.getTime(&nowTime);
-    M5.RTC.getDate(&nowDate);
-
-    struct tm nowTm;
-    nowTm.tm_year=nowDate.year;
-    nowTm.tm_mon=nowDate.mon-1;
-    nowTm.tm_mday=nowDate.day;
-    nowTm.tm_hour=nowTime.hour;
-    nowTm.tm_min=nowTime.min;
-    nowTm.tm_sec=nowTime.sec;
-    time_t searchTime = mktime(&nowTm) + h * 3600;
+    time_t searchTime = now() + h * 3600;
 
     int listNo = 0;
     int max = getMaxListNo();

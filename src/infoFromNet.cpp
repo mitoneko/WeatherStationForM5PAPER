@@ -4,6 +4,7 @@
 #include "infoFromNet.hpp"
 #include <time.h>
 
+#include "util.h"
 
 // wifiid.hには、ssid,passwordの各defineを定義を文字列として記載すること。
 // このファイルは、.gitignoreとする。
