@@ -12,18 +12,27 @@
 
 static LGFX lcd;
 
-void drawLcd(Tenki *tenki) {
+void drawLcd() {
     drawBattery(960-120-5, 5, &lcd);
-    Thermometer t = Thermometer(200,200);
-    t.drawTempMeter(&lcd, 500, 100);
-    t.drawHumMeter(&lcd, 700, 100);
 
-    Tokei tokei = Tokei(300, 100);
-    tokei.drawDigitalTokei(&lcd, 100, 100);
+    Tokei *tokei = new Tokei(300, 100);
+    tokei->drawDigitalTokei(&lcd, 630, 50);
+    delete tokei;
 
-    DrawTenki drawTenki(tenki, 500, 200);
-    drawTenki.draw(&lcd, 950-500-5 , 330);
+    Thermometer *t = new Thermometer(200,200);
+    t->drawTempMeter(&lcd, 530, 180);
+    t->drawHumMeter(&lcd, 750, 180);
+    delete t;
 
+    Tenki *tenki = new Tenki();
+    DrawTenki *drawTenki = new DrawTenki(tenki, 455, 112);
+    drawTenki->draw(&lcd, 495, 408);
+    delete drawTenki;
+    delete tenki;
+
+    //写真の表示。480*320がちょうど。
+    //プログレッシブと最適化を無効にすること。
+    lcd.drawJpgFile(SD, "/photo001.jpg", 10, 110);
     delay(500);
 }
 
@@ -41,17 +50,18 @@ void challengeShutdown() {
     M5.shutdown(rest_sec); // 一旦停止
 }
 
-void checkInfoFromNetwork(Tenki *tenki, bool always=false) {
+void checkInfoFromNetwork(bool always=false) {
     rtc_time_t time;
     M5.RTC.getTime(&time);
     time_t outdated = now() - 6*3600;
+    Tenki tenki;
 
-    if (!tenki->isEnable() || (time.hour%6==0 && time.min == 3) || tenki->getDate(0)<outdated) {
+    if (!tenki.isEnable() || (time.hour%6==0 && time.min == 3) || tenki.getDate(0)<outdated) {
         Serial.println("ネットワークの情報の取得開始");
         GetInfoFromNetwork info;
         info.setNtpTime();
         info.getWeatherInfo();
-        tenki->refresh();
+        tenki.refresh();
     }
 }
 
@@ -66,10 +76,9 @@ void setup()
     lcd.init();
     lcd.setRotation(1);
 
-    Tenki tenki;
-    checkInfoFromNetwork(&tenki);
+    checkInfoFromNetwork();
     
-    drawLcd(&tenki);
+    drawLcd();
     challengeShutdown();
 }
 
@@ -77,9 +86,8 @@ void setup()
 void loop()
 {
     delay((rest_minute()+1)*1000);
-    Tenki tenki;
-    checkInfoFromNetwork(&tenki);
-    drawLcd(&tenki);
+    checkInfoFromNetwork();
+    drawLcd();
     challengeShutdown();
 }
 
