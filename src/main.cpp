@@ -12,6 +12,20 @@
 
 static LGFX lcd;
 
+void psramtest() {
+    LGFX_Sprite test;
+    Serial.println("sprite宣言");
+    test.setColorDepth(4);
+    Serial.println("カラー設定");
+    test.setPsram(true);
+    Serial.println("psram使用設定");
+    test.createSprite(500,500);
+    Serial.println("スプライト生成");
+    test.fillSprite(0);
+    Serial.println("スプライト塗りつぶし");
+}
+
+
 void drawLcd() {
     drawBattery(960-120-5, 5, &lcd);
 
@@ -33,6 +47,8 @@ void drawLcd() {
     //写真の表示。480*320がちょうど。
     //プログレッシブと最適化を無効にすること。
     lcd.drawJpgFile(SD, "/photo001.jpg", 10, 110);
+
+    psramtest();
     delay(500);
 }
 
