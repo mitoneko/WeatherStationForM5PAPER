@@ -13,7 +13,7 @@
 static LGFX lcd;
 
 inline void printMem(const char* msg) {
-    Serial.printf("【%s】heap:%'d, spram:%'d\n", msg, ESP.getFreeHeap(), ESP.getFreePsram());
+    Serial.printf("【%s】heap:%'d, psram:%'d\n", msg, ESP.getFreeHeap(), ESP.getFreePsram());
 }
 
 void drawLcd() {
