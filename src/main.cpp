@@ -10,10 +10,14 @@
 #include "drawtenki.hpp"
 #include "util.h"
 
+//#define MEMPRINT
+
 static LGFX lcd;
 
 inline void printMem(const char* msg) {
+#ifdef MEMPRINT
     Serial.printf("【%s】heap:%'d, psram:%'d\n", msg, ESP.getFreeHeap(), ESP.getFreePsram());
+#endif
 }
 
 void drawLcd() {
