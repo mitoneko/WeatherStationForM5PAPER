@@ -12,21 +12,32 @@
 
 static LGFX lcd;
 
+inline void printMem(const char* msg) {
+    Serial.printf("【%s】heap:%'d, spram:%'d\n", msg, ESP.getFreeHeap(), ESP.getFreePsram());
+}
+
 void drawLcd() {
     drawBattery(960-120-5, 5, &lcd);
+    printMem("バッテリー描画後のメモリ");
 
+    printMem("時計描画前のメモリ");
     Tokei *tokei = new Tokei(300, 100);
     tokei->drawDigitalTokei(&lcd, 630, 50);
+    printMem("時計描画後のメモリ");
     delete tokei;
 
+    printMem("温度計描画前のメモリ");
     Thermometer *t = new Thermometer(200,200);
     t->drawTempMeter(&lcd, 530, 180);
     t->drawHumMeter(&lcd, 750, 180);
+    printMem("温度計描画後のメモリ");
     delete t;
 
+    printMem("お天気情報確保前のメモリ");
     Tenki *tenki = new Tenki();
     DrawTenki *drawTenki = new DrawTenki(tenki, 455, 112);
     drawTenki->draw(&lcd, 495, 408);
+    printMem("お天気描画後のメモリ");
     delete drawTenki;
     delete tenki;
 
