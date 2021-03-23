@@ -32,7 +32,11 @@ void drawLcd() {
 
     //写真の表示。480*320がちょうど。
     //プログレッシブと最適化を無効にすること。
-    lcd.drawJpgFile(SD, "/photo001.jpg", 10, 110);
+    char filename[15];
+    sprintf(filename, "/photo%03d.jpg", (int)random(23));
+    Serial.print("写真番号:");
+    Serial.println(filename);
+    lcd.drawJpgFile(SD,filename, 10, 110);
     delay(500);
 }
 
@@ -72,9 +76,9 @@ void setup()
     M5.RTC.begin();
     M5.SHT30.Begin();
     SD.begin();
-    Serial.begin(115200);
     lcd.init();
     lcd.setRotation(1);
+    randomSeed(analogRead(0));
 
     checkInfoFromNetwork();
     
