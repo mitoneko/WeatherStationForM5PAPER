@@ -118,7 +118,6 @@ void setup()
     M5.RTC.begin();
     M5.SHT30.Begin();
     SD.begin();
-    Serial.begin(115200);
     lcd.init();
     lcd.setRotation(1);
 
