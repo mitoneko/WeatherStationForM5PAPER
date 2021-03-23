@@ -5,12 +5,18 @@
 
 #ifndef TENKI
 #define TENKI 
+struct Allocator {
+    void* allocate(size_t size) { return ps_malloc(size); }
+    void deallocate(void *ptr) { heap_caps_free(ptr); }
+    void* reallocate(void* ptr, size_t new_size) { return ps_realloc(ptr, new_size); }
+};
+
 class Tenki {
     private:
-        DynamicJsonDocument json;
+        //DynamicJsonDocument json;
+        BasicJsonDocument<Allocator> json;
         DeserializationError jsonErr;
         bool _isEnable;
-
 
     public:
         Tenki();

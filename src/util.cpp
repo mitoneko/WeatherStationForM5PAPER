@@ -19,3 +19,4 @@ time_t now() {
 
     return mktime(&time);
 }
+
