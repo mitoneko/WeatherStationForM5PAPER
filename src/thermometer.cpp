@@ -10,10 +10,12 @@ Thermometer::Thermometer(int sizex, int sizey)
 
 void Thermometer::makeScale() {
     scale[0].setColorDepth(4);
+    scale[0].setPsram(true);
     scale[0].createSprite(radius/25, radius/5);
     scale[0].fillSprite(0);
     scale[0].setPivot(scale[0].width()/2, scale[0].height());
     scale[1].setColorDepth(4);
+    scale[1].setPsram(true);
     scale[1].createSprite(radius/40, radius/7);
     scale[1].fillSprite(0);
     scale[1].setPivot(scale[1].width()/2, scale[1].height());
@@ -25,6 +27,7 @@ void Thermometer::makeHand() {
     width = height * 0.1f;
 
     hand.setColorDepth(4);
+    hand.setPsram(true);
     hand.createSprite(width, height);
     hand.fillSprite(15);
     hand.setColor(0);
@@ -35,6 +38,7 @@ void Thermometer::makeHand() {
 
 void Thermometer::makeMeterFace(int min, int max, const char* unit) {
     face.setColorDepth(4);
+    face.setPsram(true);
     face.createSprite(sizex, sizey);
     face.fillSprite(15);
     face.setColor(0);
@@ -86,6 +90,7 @@ void Thermometer::drawString(LovyanGFX *lcd, int x, int y) {
     M5.SHT30.UpdateData();
     LGFX_Sprite meter(lcd);
     meter.setColorDepth(4);
+    meter.setPsram(true);
     meter.createSprite(250, 100);
     meter.fillSprite(15);
     meter.setColor(0);

@@ -44,6 +44,7 @@ void Tokei::drawDigitalTokei(LovyanGFX *lcd, int x, int y) {
     const float tokei_ratio = 0.75f;
     // スプライト初期化
     LGFX_Sprite tokei;
+    tokei.setPsram(true);
     tokei.setColorDepth(4);
     tokei.createSprite(width,height);
     tokei.fillSprite(15);

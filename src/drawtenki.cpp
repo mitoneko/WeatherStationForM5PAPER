@@ -9,6 +9,7 @@
 DrawTenki::DrawTenki(Tenki *tenki, int width, int height)
     : tenki(tenki), width(width), height(height)  {
     screen.setColorDepth(4);
+    screen.setPsram(true);
     screen.createSprite(width, height);
     screen.fillSprite(15);
     screen.setColor(0);
