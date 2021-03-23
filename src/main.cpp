@@ -12,7 +12,37 @@
 
 static LGFX lcd;
 
+void psramtest2() {
+    Serial.println(" ");
+    if (psramFound()) {
+        Serial.println("psramがありそう。");
+    } else {
+        Serial.println("psram無いのかな?");
+    }
+    Serial.println("psramの初期化も明示的にやってみよう。");
+    bool ret = psramInit();
+    if (ret) {
+        Serial.println("出来た。または、もうやってた。");
+    } else {
+        Serial.println("失敗した。");
+    }
+    Serial.println("メモリ確保をこれからやります。");
+    int *testmem = (int *)ps_malloc(sizeof(int)*2048);
+    if (testmem) {
+        Serial.println("確保できた");
+    } else {
+        Serial.println("確保失敗");
+        return;
+    }
+    *(testmem+500) = 5216;
+    Serial.println("addr500に5126を書いた");
+    Serial.print("さて、addr500の値は・・・");
+    Serial.println(testmem[500]);
+}
+    
+
 void psramtest() {
+    psramtest2();
     LGFX_Sprite test;
     Serial.println("sprite宣言");
     test.setColorDepth(4);
