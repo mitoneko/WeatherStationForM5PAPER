@@ -1,18 +1,24 @@
 // Jpegファイルの一覧
 
+#include <M5EPD.h>
 #include <SD.h>
 
 #include "scanfile.hpp"
 
-JpegFiles::JpegFiles() : top(NULL), cur(NULL), count(0) {
+JpegFiles::JpegFiles() : top(NULL), cur(NULL), _count(0) {
     if (!SD.exists("/")) return ;
-    File entry = SD.open("/");
+    File root = SD.open("/");
+    File entry = root.openNextFile();
     while (entry) {
-        if (entry.isDirectory()) continue;
-        if (isJpegFile(entry.name())) addFilename(entry.name());
-        entry = entry.openNextFile();
+        if (!entry.isDirectory()) { 
+            if (isJpegFile(entry.name())) {
+                addFilename(entry.name());
+            }
+        }
+        entry = root.openNextFile();
     }
     entry.close();
+    root.close();
 }
 
 FileNames *JpegFiles::addBlock(FileNames *last) {
@@ -25,19 +31,20 @@ FileNames *JpegFiles::addBlock(FileNames *last) {
 }
 
 void JpegFiles::addFilename(const char *filename) {
-    int itemInd =  count % blockSize;
+    int itemInd =  _count % blockSize;
     if (itemInd == 0) {
         cur = addBlock(cur);
         if (!top) top = cur;
     }
     strcpy(cur->filenames[itemInd], filename);
-    count ++;
+    _count ++;
 }
 
 char *JpegFiles::operator[](int i) {
     int itemInd = i % blockSize;
     int blockNo = i / blockSize;
 
+    if (i >= _count) return NULL;
     FileNames *block = top;
     for (int b=0; b < blockNo; b++) {
         if (!block) return NULL;

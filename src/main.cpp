@@ -9,6 +9,7 @@
 #include "tenki.hpp"
 #include "drawtenki.hpp"
 #include "util.h"
+#include "scanfile.hpp"
 
 //#define MEMPRINT
 
@@ -47,8 +48,9 @@ void drawLcd() {
 
     //写真の表示。480*320がちょうど。
     //プログレッシブと最適化を無効にすること。
-    char filename[15];
-    sprintf(filename, "/photo%03d.jpg", (int)random(23));
+    //SDカードのルート直下のjpgファイルを対象とする。
+    JpegFiles jpgs;
+    char *filename = jpgs[random(jpgs.count())];
     Serial.print("写真番号:");
     Serial.println(filename);
     lcd.drawJpgFile(SD,filename, 10, 110);
