@@ -11,8 +11,8 @@ struct FileNames {
 
 class JpegFiles {
     private:
-        Filenames *top;
-        Filenames *cur;
+        FileNames *top;
+        FileNames *cur;
         int count;
     public:
         JpegFiles();
@@ -21,7 +21,7 @@ class JpegFiles {
     private:
         FileNames *addBlock(FileNames *last) ;
         void addFilename(const char*filename) ;
-        bool isJpegFile(const char* filename) {
+        bool isJpegFile(const char* filename) ;
 
 
 };
