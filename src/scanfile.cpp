@@ -4,14 +4,15 @@
 
 #include "scanfile.hpp"
 
-JpegFiles::JpegFiles() : count(0), top(NULL), cur(NULL) {
+JpegFiles::JpegFiles() : top(NULL), cur(NULL), count(0) {
     if (!SD.exists("/")) return ;
-    File entry = SD.oepn("/");
+    File entry = SD.open("/");
     while (entry) {
         if (entry.isDirectory()) continue;
-        if (isJpegFile(entry.name()) addFilename(entry.name());
-        entry = openNextFile();
+        if (isJpegFile(entry.name())) addFilename(entry.name());
+        entry = entry.openNextFile();
     }
+    entry.close();
 }
 
 FileNames *JpegFiles::addBlock(FileNames *last) {
