@@ -69,9 +69,7 @@ void DrawTenki::drawTenkiInfo(int lineNo, int listNo) {
 int DrawTenki::getListNoFor1stLine() {
     time_t nowDateTime = now();
     int nowhour = (nowDateTime / 3600) % 24;
-    Serial.printf("現在%d時\n", nowhour);
     time_t todayStart = nowDateTime / (24 * 3600) * (24 * 3600);
-    Serial.printf("本日の始まりは、%s\n", ctime(&todayStart));
     time_t searchDateTime;
     time_t morning = 5 * 3600;
     time_t evening = 18 * 3600;
@@ -80,7 +78,6 @@ int DrawTenki::getListNoFor1stLine() {
     } else {
         searchDateTime = todayStart + evening;
     }
-    Serial.printf("探す日時は、%s\n", ctime(&searchDateTime));
     return tenki->getListIdSpecifiedTime(searchDateTime);
 }
 
