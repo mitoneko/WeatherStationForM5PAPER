@@ -45,10 +45,8 @@ void DrawTenki::drawFrameBorder() {
 
 
 // 一行の天気情報を描画する。 lineno:0-2
-void DrawTenki::drawTenkiInfo(int lineNo) {
-    const int hour[3] = { 12, 24, 48 };
+void DrawTenki::drawTenkiInfo(int lineNo, int listNo) {
     screen.setTextDatum(middle_left);
-    int listNo = tenki->getListIdAfterHHour(hour[lineNo]);
 
     //時間
     time_t dataTimet = tenki->getDate(listNo);
@@ -68,10 +66,28 @@ void DrawTenki::drawTenkiInfo(int lineNo) {
     screen.drawString(textbuf, columnX[3], rowCenterY[lineNo]);
 }
 
+int DrawTenki::getListNoFor1stLine() {
+    time_t nowDateTime = now();
+    int nowhour = (nowDateTime / 3600) % 24;
+    Serial.printf("現在%d時\n", nowhour);
+    time_t todayStart = nowDateTime / (24 * 3600) * (24 * 3600);
+    Serial.printf("本日の始まりは、%s\n", ctime(&todayStart));
+    time_t searchDateTime;
+    time_t morning = 5 * 3600;
+    time_t evening = 18 * 3600;
+    if (nowhour < 5 || nowhour >= 18) {
+        searchDateTime = todayStart + (24 * 3600) + morning;
+    } else {
+        searchDateTime = todayStart + evening;
+    }
+    Serial.printf("探す日時は、%s\n", ctime(&searchDateTime));
+    return tenki->getListIdSpecifiedTime(searchDateTime);
+}
+
 void DrawTenki::draw(LovyanGFX *lcd, int x, int y) {
     drawFrameBorder();
-    for (int i=0; i < 3 ; i++) {
-        drawTenkiInfo(i);
-    }
+    drawTenkiInfo(0, getListNoFor1stLine());
+    drawTenkiInfo(1, getListNoFor2ndLine());
+    drawTenkiInfo(2, getListNoFor3rdLine());
     screen.pushSprite(lcd, x, y);
 }
