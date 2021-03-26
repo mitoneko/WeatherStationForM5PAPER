@@ -40,12 +40,12 @@ const char *Tenki::getWindDir(int i) {
     return dir[idx];
 }
 
-// 現在時刻のh時間後以降の最小時刻のデータのリストNo.を取得する
-int Tenki::getListIdAfterHHour(int h) {
-    time_t searchTime = now() + h * 3600;
-
+// 指定時刻のデータのリストIDを取得する。
+// ない場合は、時刻以降の最も近いデータのIDとする。
+int Tenki::getListIdSpecifiedTime(time_t time) {
     int listNo = 0;
     int max = getMaxListNo();
-    while (listNo <= max &&  getDate(listNo) < searchTime) { listNo++; }
+    while (listNo <= max &&  getDate(listNo) < time) { listNo++; }
     return listNo;
 }
+

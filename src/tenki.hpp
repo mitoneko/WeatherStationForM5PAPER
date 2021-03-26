@@ -3,6 +3,8 @@
 #include <M5EPD.h>
 #include <ArduinoJson.h>
 
+#include "util.h"
+
 #ifndef TENKI
 #define TENKI 
 struct Allocator {
@@ -24,13 +26,15 @@ class Tenki {
         bool isEnable() { return _isEnable; }
         // リストナンバーの最大値を返す。
         int getMaxListNo() { return json["list"].size()-1; };
+        // 指定時刻のデータのリストIDを取得する。
+        int getListIdSpecifiedTime(time_t time) ;
         // 現在時刻のh時間後以降の最小時刻のデータのリストNo.を取得する
-        int getListIdAfterHHour(int h) ;
+        int getListIdAfterHHour(int h) {
+            time_t searchTime = now() + h * 3600;
+            return getListIdSpecifiedTime(searchTime);
+        }
         // 指定リストナンバーの時刻を取得する。
-        time_t getDate(int i) {
-            time_t time = json["list"][i]["dt"].as<time_t>() + 9*3600;
-            return time;
-        };
+        time_t getDate(int i) { return json["list"][i]["dt"].as<time_t>() + 9*3600; };
         // 指定リストナンバーの天気を取得する。
         const char *getWeather(int i) {
             return json["list"][i]["weather"][0]["description"].as<const char *>();

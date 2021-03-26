@@ -21,6 +21,9 @@ class DrawTenki {
     private:
         void drawFrameBorder() ;
         void calcColumnCoordinate();
-        void drawTenkiInfo(int lineNo) ;
+        void drawTenkiInfo(int lineNo, int listNo) ;
+        int getListNoFor1stLine();
+        int getListNoFor2ndLine() { return tenki->getListIdAfterHHour(24); };
+        int getListNoFor3rdLine() { return tenki->getListIdAfterHHour(48); };
 
 };
