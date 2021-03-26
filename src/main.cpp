@@ -73,11 +73,14 @@ void challengeShutdown() {
 
 void checkInfoFromNetwork(bool always=false) {
     rtc_time_t time;
+    rtc_date_t date;
+    M5.RTC.getDate(&date);
     M5.RTC.getTime(&time);
     time_t outdated = now() - 6*3600;
     Tenki tenki;
 
-    if (!tenki.isEnable() || (time.hour%6==0 && time.min == 3) || tenki.getDate(0)<outdated) {
+    if (!tenki.isEnable() || (time.hour%6==0 && time.min == 3) 
+            || tenki.getDate(0)<outdated || date.year < 2020) {
         Serial.println("ネットワークの情報の取得開始");
         GetInfoFromNetwork info;
         info.setNtpTime();
