@@ -66,7 +66,7 @@ int rest_minute() {
 
 // シャットダウンを試みる。通電中はすり抜ける
 void challengeShutdown() {
-    int rest_sec = rest_minute()-6;
+    int rest_sec = rest_minute()-4;
     if (rest_sec < 30) rest_sec += 60;
     M5.shutdown(rest_sec); // 一旦停止
 }
