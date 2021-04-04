@@ -14,6 +14,10 @@
 //#define MEMPRINT
 
 static LGFX lcd;
+bool startedOnTimer;
+bool isOperateMode=false;
+time_t timeOfOperateModeStart=0;
+time_t timeOfLastUpdate=0;
 
 inline void printMem(const char* msg) {
 #ifdef MEMPRINT
@@ -66,9 +70,11 @@ int rest_minute() {
 
 // シャットダウンを試みる。通電中はすり抜ける
 void challengeShutdown() {
+    Serial.println("電源切ってみるテスト");
     int rest_sec = rest_minute()-4;
     if (rest_sec < 30) rest_sec += 60;
     M5.shutdown(rest_sec); // 一旦停止
+    Serial.println("電源切れませんでした。");
 }
 
 void checkInfoFromNetwork(bool always=false) {
@@ -89,29 +95,75 @@ void checkInfoFromNetwork(bool always=false) {
     }
 }
 
+void saveStartedOnTimer() {
+    Wire.begin(21,22);
+    uint8_t rtcStatus = M5.RTC.readReg(0x01);
+    Serial.printf("rtc status: %x\n", rtcStatus);
+    startedOnTimer = (bool)(rtcStatus & 0x0c);
+}
+
 void setup()
 {
     M5.begin(false, true, true, true, true);
     M5.BatteryADCBegin();
-    M5.RTC.begin();
     M5.SHT30.Begin();
     SD.begin();
     lcd.init();
     lcd.setRotation(1);
     randomSeed(analogRead(0));
-
+    saveStartedOnTimer();
+    M5.RTC.begin();
     checkInfoFromNetwork();
     
     drawLcd();
-    challengeShutdown();
+
+    if (startedOnTimer) {
+        challengeShutdown();
+    }
+    timeOfOperateModeStart = now();
+    timeOfLastUpdate = timeOfOperateModeStart;
+    isOperateMode = true;
 }
 
+bool printedOpeMsg = false;
 
 void loop()
 {
-    delay((rest_minute()+1)*1000);
-    checkInfoFromNetwork();
-    drawLcd();
-    challengeShutdown();
+    LGFX_Sprite mesg;
+    mesg.setPsram(true);
+    mesg.setColorDepth(4);
+    mesg.createSprite(300, 50);
+    mesg.fillSprite(15);
+    mesg.setTextColor(0, 15);
+    mesg.setTextSize(3);
+    
+    if (isOperateMode) {
+        if (!printedOpeMsg) {
+            Serial.println("in operate mode!");
+            mesg.drawString("operate mode!", 0, 0);
+            mesg.pushSprite(&lcd, 10,500);
+            printedOpeMsg = true;
+        }
+    } else {
+        if (printedOpeMsg) {
+            mesg.pushSprite(&lcd, 10, 500);
+            printedOpeMsg = false;
+        }
+    }
+
+    if (now() - timeOfOperateModeStart > 30) {
+       isOperateMode = false;
+    }
+
+    int elapsed = now() - timeOfLastUpdate;
+    if (rest_minute() > 55 && elapsed > 50 && !isOperateMode) {
+        timeOfLastUpdate = now();
+        checkInfoFromNetwork();
+        drawLcd();
+        challengeShutdown();
+        isOperateMode = true;
+        timeOfOperateModeStart = now();
+    }
+    delay(400);
 }
 
