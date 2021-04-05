@@ -10,6 +10,7 @@
 #include "drawtenki.hpp"
 #include "util.h"
 #include "scanfile.hpp"
+#include "messageArea.hpp"
 
 //#define MEMPRINT
 
@@ -95,11 +96,15 @@ void checkInfoFromNetwork(bool always=false) {
     }
 }
 
+// RTCモジュールのタイマーより起動されたかを確認する。
+// その後、RTC.begin()相当の処理を実行する。
 void saveStartedOnTimer() {
     Wire.begin(21,22);
     uint8_t rtcStatus = M5.RTC.readReg(0x01);
-    Serial.printf("rtc status: %x\n", rtcStatus);
     startedOnTimer = (bool)(rtcStatus & 0x0c);
+    M5.RTC.writeReg(0x00, 0x00);
+    M5.RTC.writeReg(0x01, 0x00);
+    M5.RTC.writeReg(0x0D, 0x00);
 }
 
 void setup()
@@ -112,7 +117,6 @@ void setup()
     lcd.setRotation(1);
     randomSeed(analogRead(0));
     saveStartedOnTimer();
-    M5.RTC.begin();
     checkInfoFromNetwork();
     
     drawLcd();
@@ -125,30 +129,20 @@ void setup()
     isOperateMode = true;
 }
 
-bool printedOpeMsg = false;
+MessageArea mesg(490, 50, 2, true);
 
 void loop()
 {
-    LGFX_Sprite mesg;
-    mesg.setPsram(true);
-    mesg.setColorDepth(4);
-    mesg.createSprite(300, 50);
-    mesg.fillSprite(15);
-    mesg.setTextColor(0, 15);
-    mesg.setTextSize(3);
+    M5.update();
     
     if (isOperateMode) {
-        if (!printedOpeMsg) {
-            Serial.println("in operate mode!");
-            mesg.drawString("operate mode!", 0, 0);
-            mesg.pushSprite(&lcd, 10,500);
-            printedOpeMsg = true;
-        }
+        mesg.setText("操作可能", 0);
+        mesg.flush();
+        mesg.draw(&lcd, 5, 490);
     } else {
-        if (printedOpeMsg) {
-            mesg.pushSprite(&lcd, 10, 500);
-            printedOpeMsg = false;
-        }
+        mesg.setText("", 0);
+        mesg.flush();
+        mesg.draw(&lcd, 5, 490);
     }
 
     if (now() - timeOfOperateModeStart > 30) {
