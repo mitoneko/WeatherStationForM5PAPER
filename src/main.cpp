@@ -30,26 +30,28 @@ void drawLcd() {
     drawBattery(960-120-5, 5, &lcd);
     printMem("バッテリー描画後のメモリ");
 
+    {
     printMem("時計描画前のメモリ");
-    Tokei *tokei = new Tokei(300, 100);
-    tokei->drawDigitalTokei(&lcd, 630, 50);
+    Tokei tokei(300, 100);
+    tokei.drawDigitalTokei(&lcd, 630, 50);
     printMem("時計描画後のメモリ");
-    delete tokei;
+    }
 
+    {
     printMem("温度計描画前のメモリ");
-    Thermometer *t = new Thermometer(200,200);
-    t->drawTempMeter(&lcd, 530, 180);
-    t->drawHumMeter(&lcd, 750, 180);
+    Thermometer t(200,200);
+    t.drawTempMeter(&lcd, 530, 180);
+    t.drawHumMeter(&lcd, 750, 180);
     printMem("温度計描画後のメモリ");
-    delete t;
+    }
 
+    {
     printMem("お天気情報確保前のメモリ");
-    Tenki *tenki = new Tenki();
-    DrawTenki *drawTenki = new DrawTenki(tenki, 455, 112);
-    drawTenki->draw(&lcd, 495, 408);
+    Tenki tenki = Tenki();
+    DrawTenki drawTenki(&tenki, 455, 112);
+    drawTenki.draw(&lcd, 495, 408);
     printMem("お天気描画後のメモリ");
-    delete drawTenki;
-    delete tenki;
+    }
 
     //写真の表示。480*320がちょうど。
     //プログレッシブと最適化を無効にすること。
@@ -101,7 +103,7 @@ void checkInfoFromNetwork(bool always=false) {
 void saveStartedOnTimer() {
     Wire.begin(21,22);
     uint8_t rtcStatus = M5.RTC.readReg(0x01);
-    startedOnTimer = (bool)(rtcStatus & 0x0c);
+    startedOnTimer = (rtcStatus & 0x0c) != 0 ? true : false;
     M5.RTC.writeReg(0x00, 0x00);
     M5.RTC.writeReg(0x01, 0x00);
     M5.RTC.writeReg(0x0D, 0x00);
