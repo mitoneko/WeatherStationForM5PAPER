@@ -21,7 +21,8 @@ MessageArea::MessageArea(int width, int height, int line, bool flame)
 
 // ソース文字列の内容をバッファにセットする。line_noは0始まり
 // バッファの内容に変更があるかどうかをチェックし、必要がない場合書き換えない。
-MessageArea *MessageArea::setText(const char *source, const int line_no) {
+MessageArea *MessageArea::setText(const char *source, int line_no) {
+    if (line_no >= line_cnt) line_no = line_cnt - 1;
     if (strcmp(source, line_buff[line_no]) == 0) return this;
     strncpy(line_buff[line_no], source, MAX_LINE_LENGTH);
     line_buff[line_no][MAX_LINE_LENGTH] = '\0';
@@ -57,4 +58,11 @@ MessageArea *MessageArea::draw(LovyanGFX *lcd, int x, int y, bool force) {
     return this;
 }
             
+// 現在のバッファの内容を返す。line_noは0始まり
+char *MessageArea::getText(char *buff, int buffSize, int line_no) {
+    strncpy(buff, line_buff[line_no], buffSize);
+    if (buffSize <= strlen(line_buff[line_no])) buff[buffSize]='\0';
+    return buff;
+}
+
             

@@ -15,6 +15,7 @@
 //#define MEMPRINT
 
 static LGFX lcd;
+MessageArea *mesg;
 bool startedOnTimer;
 bool isOperateMode=false;
 time_t timeOfOperateModeStart=0;
@@ -28,29 +29,22 @@ inline void printMem(const char* msg) {
 
 void drawLcd() {
     drawBattery(960-120-5, 5, &lcd);
-    printMem("バッテリー描画後のメモリ");
 
     {
-    printMem("時計描画前のメモリ");
     Tokei tokei(300, 100);
     tokei.drawDigitalTokei(&lcd, 630, 50);
-    printMem("時計描画後のメモリ");
     }
 
     {
-    printMem("温度計描画前のメモリ");
     Thermometer t(200,200);
     t.drawTempMeter(&lcd, 530, 180);
     t.drawHumMeter(&lcd, 750, 180);
-    printMem("温度計描画後のメモリ");
     }
 
     {
-    printMem("お天気情報確保前のメモリ");
     Tenki tenki = Tenki();
     DrawTenki drawTenki(&tenki, 455, 112);
     drawTenki.draw(&lcd, 495, 408);
-    printMem("お天気描画後のメモリ");
     }
 
     //写真の表示。480*320がちょうど。
@@ -61,7 +55,7 @@ void drawLcd() {
     Serial.print("写真番号:");
     Serial.println(filename);
     lcd.drawJpgFile(SD,filename, 10, 110);
-    delay(500);
+    delay(400);
 }
 
 // ●分ピッタリまでの秒数
@@ -119,7 +113,9 @@ void setup()
     lcd.setRotation(1);
     randomSeed(analogRead(0));
     saveStartedOnTimer();
+    delay(10);
     checkInfoFromNetwork();
+    delay(10);
     
     drawLcd();
 
@@ -129,36 +125,52 @@ void setup()
     timeOfOperateModeStart = now();
     timeOfLastUpdate = timeOfOperateModeStart;
     isOperateMode = true;
+    
+    mesg = new MessageArea(490, 50, 2, true);
 }
 
-MessageArea mesg(490, 50, 2, true);
 
 void loop()
 {
     M5.update();
     
     if (isOperateMode) {
-        mesg.setText("操作可能", 0);
-        mesg.flush();
-        mesg.draw(&lcd, 5, 490);
+        char buff[80];
+        if (strlen(mesg->getText(buff, 80, 0)) == 0) {
+            strcat(buff, "操作可能->");
+        }
+        if (strlen(buff) > 78) {
+            strcpy(buff, "操作可能->");
+        }
+        if (M5.BtnR.wasPressed()) {
+            strcat(buff, "R");
+            timeOfOperateModeStart = now();
+        }
+        if (M5.BtnL.wasPressed()) {
+            strcat(buff, "L");
+            timeOfOperateModeStart = now();
+        }
+        if (M5.BtnP.wasPressed()) {
+            strcat(buff, "P");
+            timeOfOperateModeStart = now();
+        }
+        mesg->setText(buff, 0)->flush()->draw(&lcd, 5, 490);
     } else {
-        mesg.setText("", 0);
-        mesg.flush();
-        mesg.draw(&lcd, 5, 490);
+        mesg->setText("", 0)->flush()->draw(&lcd, 5, 490);
     }
 
-    if (now() - timeOfOperateModeStart > 30) {
-       isOperateMode = false;
-    }
+    isOperateMode = (now() - timeOfOperateModeStart < 30);
 
     int elapsed = now() - timeOfLastUpdate;
-    if (rest_minute() > 55 && elapsed > 50 && !isOperateMode) {
+    if (rest_minute() > 55 && elapsed > 50 ) {
         timeOfLastUpdate = now();
         checkInfoFromNetwork();
         drawLcd();
-        challengeShutdown();
-        isOperateMode = true;
-        timeOfOperateModeStart = now();
+        if (!isOperateMode()) {
+            challengeShutdown();
+            isOperateMode = true;
+            timeOfOperateModeStart = now();
+        }
     }
     delay(400);
 }
