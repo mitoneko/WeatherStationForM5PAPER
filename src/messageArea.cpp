@@ -1,15 +1,15 @@
 // メッセージエリアを作成し、表示管理する。
 #include "messageArea.hpp"
 
-
 MessageArea::MessageArea(int width, int height, int line, bool flame)
-    : line_cnt(line) , changed_text(false), changed_sprite(false), flame(flame) {
+    : line_cnt(line), changed_text(false), changed_sprite(false), flame(flame) {
     if (line_cnt > MAX_LINE_CNT) line_cnt = MAX_LINE_CNT;
     mesg.setPsram(true);
     mesg.setColorDepth(4);
     mesg.createSprite(width, height);
     mesg.setFont(&fonts::lgfxJapanGothic_36);
-    float line_height = (float)(height - 2 * (line_cnt - 1) - 2) / (float)line_cnt;
+    float line_height =
+        (float)(height - 2 * (line_cnt - 1) - 2) / (float)line_cnt;
     float text_size = (float)line_height / (float)mesg.fontHeight();
     mesg.setTextSize(text_size);
     mesg.setTextColor(0, 15);
@@ -57,12 +57,10 @@ MessageArea *MessageArea::draw(LovyanGFX *lcd, int x, int y, bool force) {
     }
     return this;
 }
-            
+
 // 現在のバッファの内容を返す。line_noは0始まり
 char *MessageArea::getText(char *buff, int buffSize, int line_no) {
     strncpy(buff, line_buff[line_no], buffSize);
-    if (buffSize <= strlen(line_buff[line_no])) buff[buffSize]='\0';
+    if (buffSize <= strlen(line_buff[line_no])) buff[buffSize] = '\0';
     return buff;
 }
-
-            
