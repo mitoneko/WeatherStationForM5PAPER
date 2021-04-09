@@ -5,8 +5,8 @@
 time_t now() {
     struct tm time;
     rtc_time_t rtcTime;
-    rtc_date_t rtcDate ;
-    
+    rtc_date_t rtcDate;
+
     M5.RTC.getDate(&rtcDate);
     M5.RTC.getTime(&rtcTime);
 
@@ -19,4 +19,3 @@ time_t now() {
 
     return mktime(&time);
 }
-
