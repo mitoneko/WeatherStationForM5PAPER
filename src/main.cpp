@@ -61,9 +61,9 @@ void drawLcd() {
 
 // ●分ピッタリまでの秒数
 int rest_minute() {
-    rtc_time_t time;
-    M5.RTC.getTime(&time);
-    return 60 - time.sec;
+    time_t time = now();
+    int sec = (int)(time % 60);
+    return 60 - sec;
 }
 
 // シャットダウンを試みる。通電中はすり抜ける
@@ -76,15 +76,11 @@ void challengeShutdown() {
 }
 
 void checkInfoFromNetwork(bool always = false) {
-    rtc_time_t time;
-    rtc_date_t date;
-    M5.RTC.getDate(&date);
-    M5.RTC.getTime(&time);
-    time_t outdated = now() - 6 * 3600;
+    time_t timenow = now();
+    time_t outdated = timenow - 10 * 60;
     Tenki tenki;
 
-    if (!tenki.isEnable() || (time.hour % 6 == 0 && time.min == 3) ||
-        tenki.getDate(0) < outdated || date.year < 2020) {
+    if (!tenki.isEnable() || tenki.getDate(0) < outdated || timenow == 0) {
         Serial.println("ネットワークの情報の取得開始");
         GetInfoFromNetwork info;
         info.setNtpTime();
@@ -113,9 +109,7 @@ void setup() {
     lcd.setRotation(1);
     randomSeed(analogRead(0));
     saveStartedOnTimer();
-    delay(10);
     checkInfoFromNetwork();
-    delay(10);
 
     drawLcd();
 
@@ -164,7 +158,7 @@ void loop() {
         timeOfLastUpdate = now();
         checkInfoFromNetwork();
         drawLcd();
-        if (!isOperateMode()) {
+        if (!isOperateMode) {
             challengeShutdown();
             isOperateMode = true;
             timeOfOperateModeStart = now();

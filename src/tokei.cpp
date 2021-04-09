@@ -5,28 +5,28 @@
 #include <M5EPD.h>
 #define LGFX_M5PAPER
 #include <LovyanGFX.hpp>
+#include <time.h>
 
 #include "tokei.hpp"
+#include "util.h"
 
 Tokei::Tokei(int width, int height) : width(width), height(height) {
     getDateTime();
     dayOfTheWeek = getDayOfTheWeek(year, month, day);
 }
 
-// RTCより現在時刻を取得する。
+// 現在時刻を取得する。
 void Tokei::getDateTime() {
-    rtc_time_t time;
-    rtc_date_t date;
+    time_t t = now();
+    struct tm  datetime;
+    gmtime_r(&t, &datetime);
 
-    M5.RTC.getTime(&time);
-    M5.RTC.getDate(&date);
-
-    year = date.year;
-    month = date.mon;
-    day = date.day;
-    hour = time.hour;
-    min = time.min;
-    sec = time.sec;
+    year = datetime.tm_year + 1900;
+    month = datetime.tm_mon + 1;
+    day = datetime.tm_mday;
+    hour = datetime.tm_hour;
+    min = datetime.tm_min;
+    sec = datetime.tm_sec;
 }
 
 // 曜日の計算。月曜日を0、日曜日を6とする。
