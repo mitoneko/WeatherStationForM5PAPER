@@ -3,6 +3,7 @@
 #include <HTTPClient.h>
 #include <M5EPD.h>
 #include <WiFi.h>
+#include <sys/time.h>
 #include <time.h>
 
 #include "util.h"
@@ -42,6 +43,8 @@ int GetInfoFromNetwork::setNtpTime() {
     const int daylightOffset_sec = 0;
     const char* ntpServer = "jp.pool.ntp.org";
 
+    struct timeval reset = {0, 0};
+    settimeofday(&reset, NULL);
     configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
     struct tm timeinfo;
     if (!getLocalTime(&timeinfo)) return -1;
@@ -56,6 +59,7 @@ int GetInfoFromNetwork::setNtpTime() {
     rtcDate.day = (int8_t)timeinfo.tm_mday;
     M5.RTC.setDate(&rtcDate);
     M5.RTC.setTime(&rtcTime);
+
     return 0;
 }
 
