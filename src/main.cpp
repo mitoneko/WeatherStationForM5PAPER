@@ -10,10 +10,16 @@
 #include "drawtenki.hpp"
 #include "util.h"
 #include "scanfile.hpp"
+#include "messageArea.hpp"
 
 //#define MEMPRINT
 
 static LGFX lcd;
+MessageArea *mesg;
+bool startedOnTimer;
+bool isOperateMode=false;
+time_t timeOfOperateModeStart=0;
+time_t timeOfLastUpdate=0;
 
 inline void printMem(const char* msg) {
 #ifdef MEMPRINT
@@ -23,28 +29,23 @@ inline void printMem(const char* msg) {
 
 void drawLcd() {
     drawBattery(960-120-5, 5, &lcd);
-    printMem("バッテリー描画後のメモリ");
 
-    printMem("時計描画前のメモリ");
-    Tokei *tokei = new Tokei(300, 100);
-    tokei->drawDigitalTokei(&lcd, 630, 50);
-    printMem("時計描画後のメモリ");
-    delete tokei;
+    {
+    Tokei tokei(300, 100);
+    tokei.drawDigitalTokei(&lcd, 630, 50);
+    }
 
-    printMem("温度計描画前のメモリ");
-    Thermometer *t = new Thermometer(200,200);
-    t->drawTempMeter(&lcd, 530, 180);
-    t->drawHumMeter(&lcd, 750, 180);
-    printMem("温度計描画後のメモリ");
-    delete t;
+    {
+    Thermometer t(200,200);
+    t.drawTempMeter(&lcd, 530, 180);
+    t.drawHumMeter(&lcd, 750, 180);
+    }
 
-    printMem("お天気情報確保前のメモリ");
-    Tenki *tenki = new Tenki();
-    DrawTenki *drawTenki = new DrawTenki(tenki, 455, 112);
-    drawTenki->draw(&lcd, 495, 408);
-    printMem("お天気描画後のメモリ");
-    delete drawTenki;
-    delete tenki;
+    {
+    Tenki tenki = Tenki();
+    DrawTenki drawTenki(&tenki, 455, 112);
+    drawTenki.draw(&lcd, 495, 408);
+    }
 
     //写真の表示。480*320がちょうど。
     //プログレッシブと最適化を無効にすること。
@@ -54,7 +55,7 @@ void drawLcd() {
     Serial.print("写真番号:");
     Serial.println(filename);
     lcd.drawJpgFile(SD,filename, 10, 110);
-    delay(500);
+    delay(400);
 }
 
 // ●分ピッタリまでの秒数
@@ -66,9 +67,11 @@ int rest_minute() {
 
 // シャットダウンを試みる。通電中はすり抜ける
 void challengeShutdown() {
+    Serial.println("電源切ってみるテスト");
     int rest_sec = rest_minute()-4;
     if (rest_sec < 30) rest_sec += 60;
     M5.shutdown(rest_sec); // 一旦停止
+    Serial.println("電源切れませんでした。");
 }
 
 void checkInfoFromNetwork(bool always=false) {
@@ -89,29 +92,86 @@ void checkInfoFromNetwork(bool always=false) {
     }
 }
 
+// RTCモジュールのタイマーより起動されたかを確認する。
+// その後、RTC.begin()相当の処理を実行する。
+void saveStartedOnTimer() {
+    Wire.begin(21,22);
+    uint8_t rtcStatus = M5.RTC.readReg(0x01);
+    startedOnTimer = (rtcStatus & 0x0c) != 0 ? true : false;
+    M5.RTC.writeReg(0x00, 0x00);
+    M5.RTC.writeReg(0x01, 0x00);
+    M5.RTC.writeReg(0x0D, 0x00);
+}
+
 void setup()
 {
     M5.begin(false, true, true, true, true);
     M5.BatteryADCBegin();
-    M5.RTC.begin();
     M5.SHT30.Begin();
     SD.begin();
     lcd.init();
     lcd.setRotation(1);
     randomSeed(analogRead(0));
-
+    saveStartedOnTimer();
+    delay(10);
     checkInfoFromNetwork();
+    delay(10);
     
     drawLcd();
-    challengeShutdown();
+
+    if (startedOnTimer) {
+        challengeShutdown();
+    }
+    timeOfOperateModeStart = now();
+    timeOfLastUpdate = timeOfOperateModeStart;
+    isOperateMode = true;
+    
+    mesg = new MessageArea(490, 50, 2, true);
 }
 
 
 void loop()
 {
-    delay((rest_minute()+1)*1000);
-    checkInfoFromNetwork();
-    drawLcd();
-    challengeShutdown();
+    M5.update();
+    
+    if (isOperateMode) {
+        char buff[80];
+        if (strlen(mesg->getText(buff, 80, 0)) == 0) {
+            strcat(buff, "操作可能->");
+        }
+        if (strlen(buff) > 78) {
+            strcpy(buff, "操作可能->");
+        }
+        if (M5.BtnR.wasPressed()) {
+            strcat(buff, "R");
+            timeOfOperateModeStart = now();
+        }
+        if (M5.BtnL.wasPressed()) {
+            strcat(buff, "L");
+            timeOfOperateModeStart = now();
+        }
+        if (M5.BtnP.wasPressed()) {
+            strcat(buff, "P");
+            timeOfOperateModeStart = now();
+        }
+        mesg->setText(buff, 0)->flush()->draw(&lcd, 5, 490);
+    } else {
+        mesg->setText("", 0)->flush()->draw(&lcd, 5, 490);
+    }
+
+    isOperateMode = (now() - timeOfOperateModeStart < 30);
+
+    int elapsed = now() - timeOfLastUpdate;
+    if (rest_minute() > 55 && elapsed > 50 ) {
+        timeOfLastUpdate = now();
+        checkInfoFromNetwork();
+        drawLcd();
+        if (!isOperateMode()) {
+            challengeShutdown();
+            isOperateMode = true;
+            timeOfOperateModeStart = now();
+        }
+    }
+    delay(400);
 }
 
