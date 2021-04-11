@@ -18,6 +18,7 @@ static LGFX lcd;
 MessageArea *mesg;
 bool startedOnTimer;
 bool isOperateMode = false;
+bool mustCheckInfo = false;
 time_t timeOfOperateModeStart = 0;
 time_t timeOfLastUpdate = 0;
 
@@ -71,8 +72,14 @@ void challengeShutdown() {
     Serial.println("電源切ってみるテスト");
     int rest_sec = rest_minute() - 4;
     if (rest_sec < 30) rest_sec += 60;
+    char buff[100];
+    snprintf(buff, sizeof(buff), "電源断(%d秒)", rest_sec);
+    mesg->setText(buff, 0)->flush()->draw(&lcd, 5, 490);
+    delay(400);
     M5.shutdown(rest_sec);  // 一旦停止
     Serial.println("電源切れませんでした。");
+    mesg->setText("操作可能->", 0)->flush()->draw(&lcd, 5, 490);
+    delay(200);
 }
 
 void checkInfoFromNetwork(bool always = false) {
@@ -80,13 +87,16 @@ void checkInfoFromNetwork(bool always = false) {
     time_t outdated = timenow - 10 * 60;
     Tenki tenki;
 
-    if (!tenki.isEnable() || tenki.getDate(0) < outdated || timenow == 0) {
+    if (!tenki.isEnable() || tenki.getDate(0) < outdated || timenow == 0 ||
+        mustCheckInfo) {
         Serial.println("ネットワークの情報の取得開始");
         GetInfoFromNetwork info;
         info.setNtpTime();
         info.getWeatherInfo();
         tenki.refresh();
     }
+
+    if (abs(tenki.getDate(0) - now()) > 3 * 3600 + 10 * 60) updateSystemTime();
 }
 
 // RTCモジュールのタイマーより起動されたかを確認する。
@@ -102,25 +112,32 @@ void saveStartedOnTimer() {
 
 void setup() {
     M5.begin(false, true, true, true, true);
+    Serial.println("システム初期化終了");
     M5.BatteryADCBegin();
     M5.SHT30.Begin();
     SD.begin();
     lcd.init();
     lcd.setRotation(1);
+    mesg = new MessageArea(490, 50, 2, true);
     randomSeed(analogRead(0));
     saveStartedOnTimer();
     checkInfoFromNetwork();
 
+    mesg->setText("これから書く", 0)->flush()->draw(&lcd, 5, 490);
+    delay(200);
     drawLcd();
 
+    mesg->setText("タイマー判定前", 0)->flush()->draw(&lcd, 5, 490);
+    delay(200);
+
     if (startedOnTimer) {
+        mesg->setText("これからシャットダウン", 0)->flush()->draw(&lcd, 5, 490);
+        delay(200);
         challengeShutdown();
     }
     timeOfOperateModeStart = now();
     timeOfLastUpdate = timeOfOperateModeStart;
     isOperateMode = true;
-
-    mesg = new MessageArea(490, 50, 2, true);
 }
 
 void loop() {
@@ -144,6 +161,7 @@ void loop() {
         }
         if (M5.BtnP.wasPressed()) {
             strcat(buff, "P");
+            mustCheckInfo = true;
             timeOfOperateModeStart = now();
         }
         mesg->setText(buff, 0)->flush()->draw(&lcd, 5, 490);
@@ -151,12 +169,13 @@ void loop() {
         mesg->setText("", 0)->flush()->draw(&lcd, 5, 490);
     }
 
-    isOperateMode = (now() - timeOfOperateModeStart < 30);
+    isOperateMode = (now() - timeOfOperateModeStart < 50);
 
     int elapsed = now() - timeOfLastUpdate;
     if (rest_minute() > 55 && elapsed > 50) {
         timeOfLastUpdate = now();
         checkInfoFromNetwork();
+        mustCheckInfo = false;
         drawLcd();
         if (!isOperateMode) {
             challengeShutdown();
