@@ -74,7 +74,9 @@ int DrawTenki::getListNoFor1stLine() {
     time_t searchDateTime;
     time_t morning = 5 * 3600;
     time_t evening = 18 * 3600;
-    if (nowhour < 5 || nowhour >= 18) {
+    if (nowhour < 5) {
+        searchDateTime = todayStart + morning;
+    } else if (nowhour >= 18) {
         searchDateTime = todayStart + (24 * 3600) + morning;
     } else {
         searchDateTime = todayStart + evening;

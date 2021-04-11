@@ -31,6 +31,7 @@ bool GetInfoFromNetwork::wifiOn(void) {
 void GetInfoFromNetwork::wifiOff(void) {
     WiFi.disconnect(true);
     WiFi.mode(WIFI_OFF);
+    return;
 }
 
 int GetInfoFromNetwork::isWiFiOn(void) {
@@ -39,7 +40,7 @@ int GetInfoFromNetwork::isWiFiOn(void) {
 
 int GetInfoFromNetwork::setNtpTime() {
     if (!isWiFiOn()) return -1;
-    const long gmtOffset_sec = 9 * 3600;
+    const long gmtOffset_sec = 0; 
     const int daylightOffset_sec = 0;
     const char* ntpServer = "jp.pool.ntp.org";
 
@@ -47,7 +48,9 @@ int GetInfoFromNetwork::setNtpTime() {
     settimeofday(&reset, NULL);
     configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
     struct tm timeinfo;
-    if (!getLocalTime(&timeinfo)) return -1;
+    time_t t = time(NULL);
+    if (t < 1000000000L) return -1;
+    gmtime_r(&t, &timeinfo);
 
     rtc_time_t rtcTime;
     rtcTime.hour = (int8_t)timeinfo.tm_hour;
