@@ -39,8 +39,9 @@ int GetInfoFromNetwork::isWiFiOn(void) {
 }
 
 int GetInfoFromNetwork::setNtpTime() {
+    Serial.println("NTP時刻補正開始1");
     if (!isWiFiOn()) return -1;
-    const long gmtOffset_sec = 0; 
+    const long gmtOffset_sec = 0;
     const int daylightOffset_sec = 0;
     const char* ntpServer = "jp.pool.ntp.org";
 
@@ -49,8 +50,21 @@ int GetInfoFromNetwork::setNtpTime() {
     configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
     struct tm timeinfo;
     time_t t = time(NULL);
+    int i = 0;
+    while (t < 1000000000L && i < 100) {  // システム時刻の設定完了を待つ。
+        t = time(NULL);
+        i++;
+        delay(100);
+    }
+
     if (t < 1000000000L) return -1;
+    t += 9 * 3600;
     gmtime_r(&t, &timeinfo);
+
+    char fmt[] = "%Y%m%d %H:%M:%S";
+    char s[50];
+    strftime(s, sizeof(s), fmt, gmtime(&t));
+    Serial.printf("設定時刻:%s(time_t:%ld, loop:%d)\n", s, t, i);
 
     rtc_time_t rtcTime;
     rtcTime.hour = (int8_t)timeinfo.tm_hour;
