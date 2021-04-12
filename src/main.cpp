@@ -71,15 +71,12 @@ int rest_minute() {
 void challengeShutdown() {
     Serial.println("電源切ってみるテスト");
     int rest_sec = rest_minute() - 4;
+    if (rest_sec <= 0) rest_sec = 50;
     if (rest_sec < 30) rest_sec += 60;
-    char buff[100];
-    snprintf(buff, sizeof(buff), "電源断(%d秒)", rest_sec);
-    mesg->setText(buff, 0)->flush()->draw(&lcd, 5, 490);
-    delay(400);
+    if (rest_sec > 120) rest_sec = 90;
+    Serial.printf("電源断(%d秒)\n", rest_sec);
     M5.shutdown(rest_sec);  // 一旦停止
     Serial.println("電源切れませんでした。");
-    mesg->setText("操作可能->", 0)->flush()->draw(&lcd, 5, 490);
-    delay(200);
 }
 
 void checkInfoFromNetwork(bool always = false) {
@@ -92,11 +89,22 @@ void checkInfoFromNetwork(bool always = false) {
         Serial.println("ネットワークの情報の取得開始");
         GetInfoFromNetwork info;
         info.setNtpTime();
+        updateSystemTime();
         info.getWeatherInfo();
         tenki.refresh();
     }
 
-    if (abs(tenki.getDate(0) - now()) > 3 * 3600 + 10 * 60) updateSystemTime();
+    char fmt[] = "%Y%m%d %H:%M:%S";
+    char s[50];
+    time_t t = tenki.getDate(0);
+    strftime(s, sizeof(s), fmt, gmtime(&t));
+    Serial.printf("teki-date:%s\n", s);
+    t = now();
+    strftime(s, sizeof(s), fmt, gmtime(&t));
+    Serial.printf("now-date:%s\n", s);
+
+    if (abs(tenki.getDate(0) - now()) > 3 * 3600 + 10 * 60) ESP.restart();
+
 }
 
 // RTCモジュールのタイマーより起動されたかを確認する。
@@ -123,16 +131,9 @@ void setup() {
     saveStartedOnTimer();
     checkInfoFromNetwork();
 
-    mesg->setText("これから書く", 0)->flush()->draw(&lcd, 5, 490);
-    delay(200);
     drawLcd();
 
-    mesg->setText("タイマー判定前", 0)->flush()->draw(&lcd, 5, 490);
-    delay(200);
-
     if (startedOnTimer) {
-        mesg->setText("これからシャットダウン", 0)->flush()->draw(&lcd, 5, 490);
-        delay(200);
         challengeShutdown();
     }
     timeOfOperateModeStart = now();
