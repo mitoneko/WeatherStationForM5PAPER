@@ -2,8 +2,5 @@
 tags
 src/wifiid.h
 src/apikey.h
-list/src
-list/*.aux
-list/*.log
-list/*.toc
+list/*
 メモリ調査.odt
