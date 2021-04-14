@@ -5,15 +5,15 @@
 #define WeatherFileName "/weather.jsn"
 
 class GetInfoFromNetwork {
-    private:
+   private:
+    bool wifiOn(void);
+    void wifiOff(void);
 
-        bool wifiOn(void);
-        void wifiOff(void);
-    public:
-        GetInfoFromNetwork();
-        ~GetInfoFromNetwork() ;
-        int isWiFiOn(void);
-        int setNtpTime() ;
-        String getWeatherQuery() ;
-        bool getWeatherInfo() ;
-};        
+   public:
+    GetInfoFromNetwork();
+    ~GetInfoFromNetwork();
+    int isWiFiOn(void);
+    int setNtpTime();
+    String getWeatherQuery();
+    bool getWeatherInfo();
+};

@@ -1,7 +1,9 @@
+#include "infoFromNet.hpp"
+
+#include <HTTPClient.h>
 #include <M5EPD.h>
 #include <WiFi.h>
-#include <HTTPClient.h>
-#include "infoFromNet.hpp"
+#include <sys/time.h>
 #include <time.h>
 
 #include "util.h"
@@ -13,17 +15,13 @@
 // このファイルは、.gitignoreとする。
 #include "apikey.h"
 
-GetInfoFromNetwork::GetInfoFromNetwork() {
-    wifiOn();
-}
+GetInfoFromNetwork::GetInfoFromNetwork() { wifiOn(); }
 
-GetInfoFromNetwork::~GetInfoFromNetwork() {
-    wifiOff();
-}
+GetInfoFromNetwork::~GetInfoFromNetwork() { wifiOff(); }
 
 bool GetInfoFromNetwork::wifiOn(void) {
     WiFi.begin(ssid, password);
-    for (int i = 0 ; i < 10; i++) {
+    for (int i = 0; i < 10; i++) {
         if (isWiFiOn()) return true;
         delay(500);
     }
@@ -33,38 +31,58 @@ bool GetInfoFromNetwork::wifiOn(void) {
 void GetInfoFromNetwork::wifiOff(void) {
     WiFi.disconnect(true);
     WiFi.mode(WIFI_OFF);
+    return;
 }
 
 int GetInfoFromNetwork::isWiFiOn(void) {
-    return (WiFi.status() == WL_CONNECTED) ;
+    return (WiFi.status() == WL_CONNECTED);
 }
 
 int GetInfoFromNetwork::setNtpTime() {
+    Serial.println("NTP時刻補正開始1");
     if (!isWiFiOn()) return -1;
-    const long gmtOffset_sec = 9 * 3600;
+    const long gmtOffset_sec = 0;
     const int daylightOffset_sec = 0;
-    const char * ntpServer = "jp.pool.ntp.org";
-    
+    const char* ntpServer = "jp.pool.ntp.org";
+
+    struct timeval reset = {0, 0};
+    settimeofday(&reset, NULL);
     configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
     struct tm timeinfo;
-    if (!getLocalTime(&timeinfo)) return -1;
-    
+    time_t t = time(NULL);
+    int i = 0;
+    while (t < 1000000000L && i < 100) {  // システム時刻の設定完了を待つ。
+        t = time(NULL);
+        i++;
+        delay(100);
+    }
+
+    if (t < 1000000000L) return -1;
+    t += 9 * 3600;
+    gmtime_r(&t, &timeinfo);
+
+    char fmt[] = "%Y%m%d %H:%M:%S";
+    char s[50];
+    strftime(s, sizeof(s), fmt, gmtime(&t));
+    Serial.printf("設定時刻:%s(time_t:%ld, loop:%d)\n", s, t, i);
+
     rtc_time_t rtcTime;
     rtcTime.hour = (int8_t)timeinfo.tm_hour;
     rtcTime.min = (int8_t)timeinfo.tm_min;
-    rtcTime.sec = (int8_t)timeinfo.tm_sec ;
-    rtc_date_t rtcDate ;
+    rtcTime.sec = (int8_t)timeinfo.tm_sec;
+    rtc_date_t rtcDate;
     rtcDate.year = (int8_t)timeinfo.tm_year + 1900;
     rtcDate.mon = (int8_t)timeinfo.tm_mon + 1;
-    rtcDate.day = (int8_t)timeinfo.tm_mday ;
+    rtcDate.day = (int8_t)timeinfo.tm_mday;
     M5.RTC.setDate(&rtcDate);
     M5.RTC.setTime(&rtcTime);
+
     return 0;
 }
 
-
-const uint8_t fingerprint[20] = 
-    { 0xEE,0xAA,0x58,0x6D,0x4F,0x1F,0x42,0xF4,0x18,0x5B,0x7F,0xB0,0xF2,0x0A,0x4C,0xDD,0x97,0x47,0x7D,0x99 };
+const uint8_t fingerprint[20] = {0xEE, 0xAA, 0x58, 0x6D, 0x4F, 0x1F, 0x42,
+                                 0xF4, 0x18, 0x5B, 0x7F, 0xB0, 0xF2, 0x0A,
+                                 0x4C, 0xDD, 0x97, 0x47, 0x7D, 0x99};
 #define OpenWeatherUrl "api.openweathermap.org"
 #define City "Nagahama,JP"
 
@@ -87,16 +105,17 @@ bool GetInfoFromNetwork::getWeatherInfo() {
     if (!http.begin(url)) return false;
     int retCode = http.GET();
     if (retCode < 0) goto http_err;
-    if (retCode != HTTP_CODE_OK && retCode != HTTP_CODE_MOVED_PERMANENTLY) goto http_err;
+    if (retCode != HTTP_CODE_OK && retCode != HTTP_CODE_MOVED_PERMANENTLY)
+        goto http_err;
     if (!SD.exists("/")) goto http_err;
     Serial.println("SD OK!");
     if (SD.exists(WeatherFileName)) SD.remove(WeatherFileName);
-    file=SD.open(WeatherFileName, FILE_WRITE);
+    file = SD.open(WeatherFileName, FILE_WRITE);
     if (!file) goto http_err;
     Serial.println("ファイルオープン完了");
     if (http.writeToStream(&file) < 0) goto file_err;
     file.close();
-    Serial.println("weatherファイルへのjsonデータ書き込み完了"); 
+    Serial.println("weatherファイルへのjsonデータ書き込み完了");
     http.end();
     return true;
 
@@ -105,5 +124,4 @@ file_err:
 http_err:
     http.end();
     return false;
-}    
-
+}
